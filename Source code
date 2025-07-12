@@ -1,0 +1,45 @@
+import csv
+from datetime import datetime
+
+# File to store attendance
+ATTENDANCE_FILE = "attendance.csv"
+
+# Simulated database of users (can be linked to RFID or keypad in real-life)
+registered_users = {
+    "101": "Alice",
+    "102": "Bob",
+    "103": "Charlie"
+}
+
+# Function to write attendance
+def mark_attendance(user_id):
+    name = registered_users.get(user_id)
+    if not name:
+        print("Unrecognized ID!")
+        return
+
+    now = datetime.now()
+    date_str = now.strftime("%Y-%m-%d")
+    time_str = now.strftime("%H:%M:%S")
+
+    # Avoid duplicate entries for the day
+    with open(ATTENDANCE_FILE, mode='a+', newline='') as file:
+        file.seek(0)
+        existing = file.read()
+        if f"{user_id},{date_str}" in existing:
+            print(f"{name} already marked present today.")
+            return
+
+        writer = csv.writer(file)
+        writer.writerow([user_id, name, date_str, time_str])
+        print(f"Attendance marked for {name} at {time_str}")
+
+# Main loop
+print("Digital Door Attendance System")
+print("Enter ID to simulate door entry. Type 'exit' to stop.\n")
+
+while True:
+    user_input = input("Enter ID: ").strip()
+    if user_input.lower() == "exit":
+        break
+    mark_attendance(user_input)
